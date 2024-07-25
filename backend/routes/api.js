@@ -148,4 +148,33 @@ router.post('/search', async (req, res) => {
     }
 });
 
+let cart = [];
+
+router.get('/cart', (req, res) => {
+    res.json(cart);
+});
+
+router.post('/cart', (req, res) => {
+    const { partNumber, manufacturer, provider, volume, unitPrice, totalPrice } = req.body;
+    const existingItemIndex = cart.findIndex(item => item.partNumber === partNumber && item.provider === provider);
+    if (existingItemIndex > -1) {
+        cart[existingItemIndex] = { partNumber, manufacturer, provider, volume, unitPrice, totalPrice };
+    } else {
+        cart.push({ partNumber, manufacturer, provider, volume, unitPrice, totalPrice });
+    }
+    res.json(cart);
+});
+
+router.put('/cart', (req, res) => {
+    const { partNumber, provider, volume } = req.body;
+    const existingItemIndex = cart.findIndex(item => item.partNumber === partNumber && item.provider === provider);
+    if (existingItemIndex > -1) {
+        const item = cart[existingItemIndex];
+        item.volume = volume;
+        item.totalPrice = (item.unitPrice * volume).toFixed(4);
+    }
+    res.json(cart);
+});
+
+
 module.exports = router;
